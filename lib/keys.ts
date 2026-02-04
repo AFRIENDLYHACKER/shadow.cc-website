@@ -83,7 +83,7 @@ export function claimKey(productId: string): string | null {
 
 // Helper to rebuild keys file content
 function buildKeysFileContent(keys: KeyEntry[]): string {
-  const header = `# Shadow.CC License Keys
+  const header = `# Vlasic.CC License Keys
 # Format: KEY|PRODUCT_ID
 # Add your keys below (one per line):
 #
@@ -101,11 +101,14 @@ function buildKeysFileContent(keys: KeyEntry[]): string {
   let content = header
   
   // Write each group
-  const productOrder = ['shadow-weekly', 'shadow-monthly', 'shadow-lifetime']
+  const productOrder = ['vlasic-weekly', 'vlasic-monthly', 'vlasic-lifetime', 'discord-alts-10', 'discord-alts-50', 'discord-alts-100']
   const productLabels: Record<string, string> = {
-    'shadow-weekly': '# Weekly Keys',
-    'shadow-monthly': '# Monthly Keys',
-    'shadow-lifetime': '# Lifetime Keys',
+    'vlasic-weekly': '# Weekly Keys',
+    'vlasic-monthly': '# Monthly Keys',
+    'vlasic-lifetime': '# Lifetime Keys',
+    'discord-alts-10': '# Discord Alts (10)',
+    'discord-alts-50': '# Discord Alts (50)',
+    'discord-alts-100': '# Discord Alts (100)',
   }
   
   for (const productId of productOrder) {

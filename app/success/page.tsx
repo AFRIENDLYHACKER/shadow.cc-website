@@ -13,6 +13,9 @@ const productNames: Record<string, string> = {
   'vlasic-weekly': 'Weekly Key',
   'vlasic-monthly': 'Monthly Key',
   'vlasic-lifetime': 'Lifetime Key',
+  'discord-alts-10': '10 Discord Alts',
+  'discord-alts-50': '50 Discord Alts',
+  'discord-alts-100': '100 Discord Alts',
 }
 
 export default function SuccessPage() {
