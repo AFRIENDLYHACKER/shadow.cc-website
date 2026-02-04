@@ -12,9 +12,9 @@ export interface Product {
 
 export const PRODUCTS: Product[] = [
   {
-    id: 'shadow-weekly',
+    id: 'vlasic-weekly',
     name: 'Weekly Key',
-    description: 'Perfect for trying out Shadow Script. Full access for 7 days.',
+    description: 'Perfect for trying out Vlasic. Full access for 7 days.',
     priceInCents: 499,
     category: 'Keys',
     duration: '7 Days',
@@ -28,7 +28,7 @@ export const PRODUCTS: Product[] = [
     stock: 999,
   },
   {
-    id: 'shadow-monthly',
+    id: 'vlasic-monthly',
     name: 'Monthly Key',
     description: 'Best value for regular users. Full access for 30 days.',
     priceInCents: 1499,
@@ -46,7 +46,7 @@ export const PRODUCTS: Product[] = [
     stock: 500,
   },
   {
-    id: 'shadow-lifetime',
+    id: 'vlasic-lifetime',
     name: 'Lifetime Key',
     description: 'One-time purchase. Never pay again with permanent access.',
     priceInCents: 4999,
