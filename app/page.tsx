@@ -6,7 +6,9 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe
 import { PRODUCTS, Product } from '@/lib/products'
 import { startCheckoutSession } from '@/app/actions/stripe'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) 
+  : null
 
 interface CartItem {
   product: Product
@@ -73,7 +75,7 @@ function Hero() {
         
         <div className="mt-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <p className="text-lg md:text-xl text-muted-foreground max-w-md leading-relaxed">
-            Premium scripts with advanced features, instant delivery, and round-the-clock support.
+            Premium scripts for Tha Bronx 3 & Philly Streets 2. Plus Discord alts with instant delivery.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -104,10 +106,10 @@ function Hero() {
 // Stats Section - Minimal
 function Stats() {
   const stats = [
-    { value: '10K+', label: 'Active Users' },
+    { value: '5K+', label: 'Active Users' },
     { value: '99.9%', label: 'Uptime' },
     { value: '24/7', label: 'Support' },
-    { value: '50+', label: 'Games' },
+    { value: '2', label: 'Games Supported' },
   ]
 
   return (
@@ -149,6 +151,15 @@ function ProductCard({ product, onAddToCart, stock }: { product: Product; onAddT
       <div className="mb-6">
         <h3 className="text-2xl font-bold tracking-tight text-foreground">{product.name}</h3>
         <p className="text-accent text-sm uppercase tracking-wider mt-1">{product.duration}</p>
+        {product.games && product.games.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {product.games.map((game, i) => (
+              <span key={i} className="text-xs bg-accent/10 text-accent px-2 py-0.5 uppercase tracking-wider">
+                {game}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       
       <div className="mb-6">
@@ -197,18 +208,38 @@ function ProductCard({ product, onAddToCart, stock }: { product: Product; onAddT
 
 // Products Section
 function Products({ onAddToCart, stock }: { onAddToCart: (product: Product) => void; stock: Record<string, number> }) {
+  const [activeCategory, setActiveCategory] = useState<string>('Script Keys')
+  const categories = ['Script Keys', 'Discord Alts']
+  const filteredProducts = PRODUCTS.filter(p => p.category === activeCategory)
+
   return (
     <section id="products" className="py-24 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-foreground uppercase">Choose Your Plan</h2>
+          <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-foreground uppercase">Choose Your Product</h2>
           <p className="text-muted-foreground text-lg mt-4 max-w-xl">
-            Select the duration that works best for you. All plans include full access and instant delivery.
+            Premium scripts and Discord accounts with instant delivery.
           </p>
         </div>
 
+        <div className="flex gap-2 mb-10">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-6 py-3 text-sm uppercase tracking-wider font-medium transition-all ${
+                activeCategory === cat
+                  ? 'bg-foreground text-background'
+                  : 'border border-border text-muted-foreground hover:border-foreground/50 hover:text-foreground'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         <div className="grid md:grid-cols-3 gap-6">
-          {PRODUCTS.map(product => (
+          {filteredProducts.map(product => (
             <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} stock={stock[product.id] || 0} />
           ))}
         </div>
@@ -279,9 +310,20 @@ function ScriptFeatures() {
   )
 }
 
-// Supported Games - Marquee Style
+// Supported Games Section
 function SupportedGames() {
-  const games = ['Blox Fruits', 'Pet Simulator X', 'Arsenal', 'Murder Mystery 2', 'Jailbreak', 'Adopt Me', 'Tower of Hell', 'King Legacy']
+  const games = [
+    { 
+      name: 'Tha Bronx 3', 
+      desc: 'Dominate the streets with auto farm, ESP, aimbot, and more.',
+      features: ['Auto Farm', 'Player ESP', 'Aimbot', 'Speed Hack', 'Teleport']
+    },
+    { 
+      name: 'Philly Streets 2', 
+      desc: 'Rule Philly with advanced combat scripts and movement hacks.',
+      features: ['Auto Farm', 'Wallhack', 'Silent Aim', 'Fly Hack', 'Anti-AFK']
+    },
+  ]
   
   return (
     <section className="py-24 px-6">
@@ -289,18 +331,26 @@ function SupportedGames() {
         <div className="mb-16 text-center">
           <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-foreground uppercase">Supported Games</h2>
           <p className="text-muted-foreground text-lg mt-4">
-            Works with 50+ popular games and counting.
+            One script, two games. Full support for both titles.
           </p>
         </div>
         
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="grid md:grid-cols-2 gap-6">
           {games.map((game, i) => (
-            <span 
-              key={i} 
-              className="border border-border px-6 py-3 text-foreground text-sm uppercase tracking-wider hover:border-foreground/50 hover:bg-card transition-all cursor-default"
-            >
-              {game}
-            </span>
+            <div key={i} className="border border-border p-8 hover:border-foreground/50 transition-all bg-card/50">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-3 h-3 bg-accent" />
+                <h3 className="text-2xl font-bold tracking-tight text-foreground">{game.name}</h3>
+              </div>
+              <p className="text-muted-foreground mb-6">{game.desc}</p>
+              <div className="flex flex-wrap gap-2">
+                {game.features.map((f, j) => (
+                  <span key={j} className="text-xs border border-border px-3 py-1.5 text-foreground/70 uppercase tracking-wider">
+                    {f}
+                  </span>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -537,6 +587,10 @@ function CheckoutModal({
               >
                 Try Again
               </button>
+            </div>
+          ) : !stripePromise ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">Stripe is not configured. Please set up the NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable.</p>
             </div>
           ) : (
             <EmbeddedCheckoutProvider
