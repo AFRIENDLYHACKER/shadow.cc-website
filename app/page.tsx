@@ -6,7 +6,9 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe
 import { PRODUCTS, Product } from '@/lib/products'
 import { startCheckoutSession } from '@/app/actions/stripe'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) 
+  : null
 
 interface CartItem {
   product: Product
@@ -537,6 +539,10 @@ function CheckoutModal({
               >
                 Try Again
               </button>
+            </div>
+          ) : !stripePromise ? (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">Stripe is not configured. Please set up the NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable.</p>
             </div>
           ) : (
             <EmbeddedCheckoutProvider
