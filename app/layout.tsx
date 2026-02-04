@@ -8,8 +8,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Shadow.CC | Premium Digital Services',
-  description: 'Premium digital services with instant delivery. Secure, reliable, and always available.',
+  title: 'Vlasic.CC | Premium Digital Services',
+  description: 'Elite digital services with instant delivery. Secure, reliable, and unmatched quality.',
   generator: 'v0.app',
   icons: {
     icon: [

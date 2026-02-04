@@ -10,9 +10,9 @@ interface ClaimedKey {
 }
 
 const productNames: Record<string, string> = {
-  'shadow-weekly': 'Weekly Key',
-  'shadow-monthly': 'Monthly Key',
-  'shadow-lifetime': 'Lifetime Key',
+  'vlasic-weekly': 'Weekly Key',
+  'vlasic-monthly': 'Monthly Key',
+  'vlasic-lifetime': 'Lifetime Key',
 }
 
 export default function SuccessPage() {
@@ -31,7 +31,6 @@ export default function SuccessPage() {
       return
     }
 
-    // Claim key from the keys.txt file
     fetch('/api/claim-key', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +46,6 @@ export default function SuccessPage() {
           setClaimedKeys(data.keys)
           setCustomerEmail(data.email || '')
         } else if (data.key) {
-          // Key was already claimed for this session
           setStatus('success')
           setClaimedKeys([{ productId: 'unknown', key: data.key }])
         } else {
@@ -70,10 +68,10 @@ export default function SuccessPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Processing your payment and retrieving your key...</p>
+          <div className="w-12 h-12 border-2 border-foreground border-t-transparent mx-auto mb-4 animate-spin" />
+          <p className="text-muted-foreground">Processing your payment...</p>
         </div>
       </div>
     )
@@ -81,27 +79,27 @@ export default function SuccessPage() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-card border border-border p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 border border-destructive mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Something Went Wrong</h1>
-          <p className="text-gray-400 mb-6">{errorMessage || 'Please contact support with your payment confirmation.'}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2 uppercase tracking-tight">Something Went Wrong</h1>
+          <p className="text-muted-foreground mb-6">{errorMessage || 'Please contact support with your payment confirmation.'}</p>
           <div className="flex gap-3">
             <Link
               href="/"
-              className="flex-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+              className="flex-1 border border-border hover:border-foreground/50 text-foreground py-3 px-6 transition-colors text-center text-sm uppercase tracking-wider"
             >
               Return to Shop
             </Link>
             <a
-              href="https://discord.gg/shadow"
+              href="https://discord.gg/Kezxm2TyGY"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+              className="flex-1 bg-foreground text-background py-3 px-6 transition-colors text-center text-sm uppercase tracking-wider hover:bg-accent"
             >
               Contact Support
             </a>
@@ -112,45 +110,44 @@ export default function SuccessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 max-w-lg w-full">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="bg-card border border-border p-8 max-w-lg w-full">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-20 h-20 border border-accent mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-10 h-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Payment Successful!</h1>
-          <p className="text-gray-400">Thank you for your purchase</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2 uppercase tracking-tight">Payment Successful</h1>
+          <p className="text-muted-foreground">Thank you for your purchase</p>
           {customerEmail && (
-            <p className="text-gray-500 text-sm mt-1">Receipt sent to {customerEmail}</p>
+            <p className="text-muted-foreground/70 text-sm mt-1">Receipt sent to {customerEmail}</p>
           )}
         </div>
 
-        {/* Display all claimed keys */}
         {claimedKeys.map((claimed, index) => (
-          <div key={index} className="bg-black border border-zinc-700 rounded-xl p-6 mb-4">
+          <div key={index} className="bg-background border border-border p-6 mb-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 text-sm font-medium">
+              <span className="text-muted-foreground text-sm font-medium uppercase tracking-wider">
                 {productNames[claimed.productId] || 'LICENSE KEY'} #{index + 1}
               </span>
-              <span className="bg-red-600/20 text-red-400 text-xs px-2 py-1 rounded">SAVE THIS</span>
+              <span className="border border-accent text-accent text-xs px-2 py-1 uppercase tracking-wider">Save This</span>
             </div>
             <div className="flex items-center gap-3">
-              <code className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-lg font-mono text-white tracking-wider overflow-x-auto">
+              <code className="flex-1 bg-secondary border border-border px-4 py-3 text-lg font-mono text-foreground tracking-wider overflow-x-auto">
                 {claimed.key}
               </code>
               <button
                 onClick={() => copyToClipboard(claimed.key, index)}
-                className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg p-3 transition-colors flex-shrink-0"
+                className="border border-border hover:border-foreground/50 p-3 transition-colors flex-shrink-0"
                 title="Copy to clipboard"
               >
                 {copiedIndex === index ? (
-                  <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 )}
@@ -159,22 +156,22 @@ export default function SuccessPage() {
           </div>
         ))}
 
-        <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-4 mb-6">
-          <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-            <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="bg-secondary border border-border p-4 mb-6">
+          <h3 className="text-foreground font-semibold mb-3 flex items-center gap-2 uppercase tracking-wider text-sm">
+            <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             How to Redeem
           </h3>
-          <ol className="text-gray-400 text-sm space-y-2 list-decimal list-inside">
+          <ol className="text-muted-foreground text-sm space-y-2 list-decimal list-inside">
             <li>Open your executor and load the script</li>
             <li>When prompted, paste your license key</li>
             <li>Click verify and enjoy the features</li>
           </ol>
         </div>
 
-        <div className="bg-red-600/10 border border-red-600/30 rounded-xl p-4 mb-6">
-          <p className="text-red-400 text-sm flex items-start gap-2">
+        <div className="bg-destructive/10 border border-destructive/30 p-4 mb-6">
+          <p className="text-destructive text-sm flex items-start gap-2">
             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -187,15 +184,15 @@ export default function SuccessPage() {
         <div className="flex gap-3">
           <Link
             href="/"
-            className="flex-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+            className="flex-1 border border-border hover:border-foreground/50 text-foreground py-3 px-6 transition-colors text-center text-sm uppercase tracking-wider"
           >
             Back to Shop
           </Link>
           <a
-            href="https://discord.gg/shadow"
+            href="https://discord.gg/Kezxm2TyGY"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+            className="flex-1 bg-foreground text-background py-3 px-6 transition-colors text-center text-sm uppercase tracking-wider hover:bg-accent"
           >
             Join Discord
           </a>
