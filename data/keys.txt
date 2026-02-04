@@ -1,0 +1,23 @@
+# Shadow.CC License Keys
+# Format: KEY|PRODUCT_ID
+# Example: ABCD-1234-EFGH-5678|shadow-weekly
+#
+# Add your keys below (one per line):
+# Weekly Keys
+SHAD-WEEK-0001-XXXX|shadow-weekly
+SHAD-WEEK-0002-XXXX|shadow-weekly
+SHAD-WEEK-0003-XXXX|shadow-weekly
+SHAD-WEEK-0004-XXXX|shadow-weekly
+SHAD-WEEK-0005-XXXX|shadow-weekly
+# Monthly Keys
+SHAD-MNTH-0001-XXXX|shadow-monthly
+SHAD-MNTH-0002-XXXX|shadow-monthly
+SHAD-MNTH-0003-XXXX|shadow-monthly
+SHAD-MNTH-0004-XXXX|shadow-monthly
+SHAD-MNTH-0005-XXXX|shadow-monthly
+# Lifetime Keys
+SHAD-LIFE-0001-XXXX|shadow-lifetime
+SHAD-LIFE-0002-XXXX|shadow-lifetime
+SHAD-LIFE-0003-XXXX|shadow-lifetime
+SHAD-LIFE-0004-XXXX|shadow-lifetime
+SHAD-LIFE-0005-XXXX|shadow-lifetime
