@@ -68,7 +68,7 @@ function Hero() {
         <h1 className="text-[clamp(3rem,12vw,10rem)] font-bold leading-[0.85] tracking-tighter text-foreground uppercase">
           Dominate
           <br />
-          <span className="text-stroke">Every Game</span>
+          <span className="text-stroke-outline">Every Game</span>
         </h1>
         
         <div className="mt-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -97,13 +97,6 @@ function Hero() {
           </div>
         </div>
       </div>
-      
-      <style jsx>{`
-        .text-stroke {
-          -webkit-text-stroke: 2px currentColor;
-          -webkit-text-fill-color: transparent;
-        }
-      `}</style>
     </section>
   )
 }
