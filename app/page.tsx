@@ -150,7 +150,7 @@ function Hero() {
             Get Started
           </a>
           <a
-            href="https://discord.gg/shadow"
+            href="https://discord.gg/Kezxm2TyGY"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-white font-semibold py-4 px-8 rounded-lg transition-colors flex items-center justify-center gap-2"
@@ -172,7 +172,7 @@ function Stats() {
     <section className="py-12 px-6 border-y border-red-900/30 bg-black/50">
       <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
         <div className="text-center">
-          <div className="text-3xl font-bold text-red-500">10K+</div>
+          <div className="text-3xl font-bold text-red-500">10k+</div>
           <div className="text-gray-400 text-sm">Active Users</div>
         </div>
         <div className="text-center">
@@ -424,7 +424,7 @@ function Footer() {
           </div>
           <span className="text-lg font-bold text-white group-hover:text-red-500 transition-colors">Shadow.CC</span>
         </a>
-        <p className="text-gray-500 text-sm">© 2024 Shadow.CC. All rights reserved.</p>
+        <p className="text-gray-500 text-sm">© 2026 Shadow.CC. All rights reserved.</p>
         <div className="flex items-center gap-4">
           <a href="https://discord.gg/shadow" className="text-gray-400 hover:text-red-500 transition-colors">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
