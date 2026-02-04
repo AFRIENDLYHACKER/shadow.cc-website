@@ -645,13 +645,24 @@ function CheckoutModal({
   onClose: () => void
   cart: CartItem[]
 }) {
+  const [error, setError] = useState<string | null>(null)
+  
   const fetchClientSecret = useCallback(async () => {
-    const items = cart.map(item => ({
-      productId: item.product.id,
-      quantity: item.quantity,
-    }))
-    const { clientSecret } = await startCheckoutSession(items)
-    return clientSecret
+    try {
+      setError(null)
+      const items = cart.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+      }))
+      const result = await startCheckoutSession(items)
+      if (!result.clientSecret) {
+        throw new Error('Failed to create checkout session')
+      }
+      return result.clientSecret
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+      throw err
+    }
   }, [cart])
 
   if (!isOpen) return null
@@ -669,12 +680,29 @@ function CheckoutModal({
           </button>
         </div>
         <div className="p-6 max-h-[70vh] overflow-y-auto">
-          <EmbeddedCheckoutProvider
-            stripe={stripePromise}
-            options={{ fetchClientSecret }}
-          >
-            <EmbeddedCheckout className="stripe-checkout" />
-          </EmbeddedCheckoutProvider>
+          {error ? (
+            <div className="text-center py-8">
+              <div className="w-12 h-12 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <p className="text-red-400 mb-4">{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <EmbeddedCheckoutProvider
+              stripe={stripePromise}
+              options={{ fetchClientSecret }}
+            >
+              <EmbeddedCheckout className="stripe-checkout" />
+            </EmbeddedCheckoutProvider>
+          )}
         </div>
       </div>
     </div>

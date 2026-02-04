@@ -2,6 +2,7 @@
 
 import { stripe } from '@/lib/stripe'
 import { PRODUCTS } from '@/lib/products'
+import { headers } from 'next/headers'
 
 interface CartItem {
   productId: string
@@ -12,6 +13,9 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
   if (!cartItems || cartItems.length === 0) {
     throw new Error('Cart is empty')
   }
+
+  const headersList = await headers()
+  const origin = headersList.get('origin') || 'http://localhost:3000'
 
   const lineItems = cartItems.map(item => {
     const product = PRODUCTS.find(p => p.id === item.productId)
@@ -34,10 +38,19 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
-    redirect_on_completion: 'never',
     line_items: lineItems,
     mode: 'payment',
+    return_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
   })
 
-  return session.client_secret
+  return { clientSecret: session.client_secret }
+}
+
+export async function getCheckoutSession(sessionId: string) {
+  const session = await stripe.checkout.sessions.retrieve(sessionId)
+  return {
+    status: session.status,
+    customerEmail: session.customer_details?.email,
+    paymentStatus: session.payment_status,
+  }
 }
