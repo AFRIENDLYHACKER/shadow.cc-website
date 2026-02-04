@@ -2,59 +2,70 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { getCheckoutSession } from '@/app/actions/stripe'
 import Link from 'next/link'
 
-function generateLicenseKey(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  const segments = 4
-  const segmentLength = 5
-  const keyParts: string[] = []
-  
-  for (let i = 0; i < segments; i++) {
-    let segment = ''
-    for (let j = 0; j < segmentLength; j++) {
-      segment += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    keyParts.push(segment)
-  }
-  
-  return keyParts.join('-')
+interface ClaimedKey {
+  productId: string
+  key: string
+}
+
+const productNames: Record<string, string> = {
+  'shadow-weekly': 'Weekly Key',
+  'shadow-monthly': 'Monthly Key',
+  'shadow-lifetime': 'Lifetime Key',
 }
 
 export default function SuccessPage() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-  const [licenseKey, setLicenseKey] = useState<string>('')
+  const [claimedKeys, setClaimedKeys] = useState<ClaimedKey[]>([])
   const [customerEmail, setCustomerEmail] = useState<string>('')
-  const [copied, setCopied] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
 
   useEffect(() => {
     if (!sessionId) {
       setStatus('error')
+      setErrorMessage('No session ID found')
       return
     }
 
-    getCheckoutSession(sessionId)
-      .then((session) => {
-        if (session.paymentStatus === 'paid') {
+    // Claim key from the keys.txt file
+    fetch('/api/claim-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error && !data.keys) {
+          setStatus('error')
+          setErrorMessage(data.error)
+        } else if (data.keys && data.keys.length > 0) {
           setStatus('success')
-          setLicenseKey(generateLicenseKey())
-          setCustomerEmail(session.customerEmail || '')
+          setClaimedKeys(data.keys)
+          setCustomerEmail(data.email || '')
+        } else if (data.key) {
+          // Key was already claimed for this session
+          setStatus('success')
+          setClaimedKeys([{ productId: 'unknown', key: data.key }])
         } else {
           setStatus('error')
+          setErrorMessage('Failed to retrieve your license key')
         }
       })
-      .catch(() => {
+      .catch(err => {
+        console.error('Error claiming key:', err)
         setStatus('error')
+        setErrorMessage('Something went wrong. Please contact support.')
       })
   }, [sessionId])
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(licenseKey)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyToClipboard = (key: string, index: number) => {
+    navigator.clipboard.writeText(key)
+    setCopiedIndex(index)
+    setTimeout(() => setCopiedIndex(null), 2000)
   }
 
   if (status === 'loading') {
@@ -62,7 +73,7 @@ export default function SuccessPage() {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Processing your payment...</p>
+          <p className="text-gray-400">Processing your payment and retrieving your key...</p>
         </div>
       </div>
     )
@@ -77,14 +88,24 @@ export default function SuccessPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Payment Failed</h1>
-          <p className="text-gray-400 mb-6">Something went wrong with your payment. Please try again.</p>
-          <Link
-            href="/"
-            className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            Return to Shop
-          </Link>
+          <h1 className="text-2xl font-bold text-white mb-2">Something Went Wrong</h1>
+          <p className="text-gray-400 mb-6">{errorMessage || 'Please contact support with your payment confirmation.'}</p>
+          <div className="flex gap-3">
+            <Link
+              href="/"
+              className="flex-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+            >
+              Return to Shop
+            </Link>
+            <a
+              href="https://discord.gg/shadow"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center"
+            >
+              Contact Support
+            </a>
+          </div>
         </div>
       </div>
     )
@@ -106,32 +127,37 @@ export default function SuccessPage() {
           )}
         </div>
 
-        <div className="bg-black border border-zinc-700 rounded-xl p-6 mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-gray-400 text-sm font-medium">YOUR LICENSE KEY</span>
-            <span className="bg-red-600/20 text-red-400 text-xs px-2 py-1 rounded">SAVE THIS</span>
+        {/* Display all claimed keys */}
+        {claimedKeys.map((claimed, index) => (
+          <div key={index} className="bg-black border border-zinc-700 rounded-xl p-6 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-gray-400 text-sm font-medium">
+                {productNames[claimed.productId] || 'LICENSE KEY'} #{index + 1}
+              </span>
+              <span className="bg-red-600/20 text-red-400 text-xs px-2 py-1 rounded">SAVE THIS</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <code className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-lg font-mono text-white tracking-wider overflow-x-auto">
+                {claimed.key}
+              </code>
+              <button
+                onClick={() => copyToClipboard(claimed.key, index)}
+                className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg p-3 transition-colors flex-shrink-0"
+                title="Copy to clipboard"
+              >
+                {copiedIndex === index ? (
+                  <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <code className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-3 text-lg font-mono text-white tracking-wider">
-              {licenseKey}
-            </code>
-            <button
-              onClick={copyToClipboard}
-              className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg p-3 transition-colors"
-              title="Copy to clipboard"
-            >
-              {copied ? (
-                <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
+        ))}
 
         <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl p-4 mb-6">
           <h3 className="text-white font-semibold mb-3 flex items-center gap-2">

@@ -205,14 +205,21 @@ function Stats() {
 }
 
 // Product Card
-function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: (product: Product) => void }) {
+function ProductCard({ product, onAddToCart, stock }: { product: Product; onAddToCart: (product: Product) => void; stock: number }) {
+  const outOfStock = stock === 0
+  
   return (
     <div className={`relative bg-black/60 backdrop-blur-sm border rounded-xl p-6 transition-all hover:scale-[1.02] group ${
       product.popular ? 'border-red-500 ring-2 ring-red-500/20' : 'border-red-900/30 hover:border-red-600/50'
-    }`}>
-      {product.popular && (
+    } ${outOfStock ? 'opacity-60' : ''}`}>
+      {product.popular && !outOfStock && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-4 py-1 rounded-full">
           MOST POPULAR
+        </div>
+      )}
+      {outOfStock && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-600 text-white text-xs font-bold px-4 py-1 rounded-full">
+          OUT OF STOCK
         </div>
       )}
       <div className="text-center mb-6">
@@ -234,6 +241,14 @@ function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: 
         <p className="text-gray-500 text-sm mt-1">one-time payment</p>
       </div>
 
+      {/* Stock indicator */}
+      <div className="flex items-center justify-center gap-2 mb-4">
+        <span className={`w-2 h-2 rounded-full ${stock > 10 ? 'bg-green-500' : stock > 0 ? 'bg-yellow-500' : 'bg-red-500'}`} />
+        <span className={`text-sm ${stock > 10 ? 'text-green-400' : stock > 0 ? 'text-yellow-400' : 'text-red-400'}`}>
+          {stock > 0 ? `${stock} keys in stock` : 'Out of stock'}
+        </span>
+      </div>
+
       <p className="text-gray-400 text-sm text-center mb-6">{product.description}</p>
       
       <ul className="space-y-3 mb-6">
@@ -248,24 +263,27 @@ function ProductCard({ product, onAddToCart }: { product: Product; onAddToCart: 
       </ul>
       
       <button
-        onClick={() => onAddToCart(product)}
+        onClick={() => !outOfStock && onAddToCart(product)}
+        disabled={outOfStock}
         className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-colors ${
-          product.popular
-            ? 'bg-red-600 hover:bg-red-700 text-white'
-            : 'bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-600/50'
+          outOfStock
+            ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+            : product.popular
+              ? 'bg-red-600 hover:bg-red-700 text-white'
+              : 'bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-600/50'
         }`}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
-        Add to Cart
+        {outOfStock ? 'Out of Stock' : 'Add to Cart'}
       </button>
     </div>
   )
 }
 
 // Products Section
-function Products({ onAddToCart }: { onAddToCart: (product: Product) => void }) {
+function Products({ onAddToCart, stock }: { onAddToCart: (product: Product) => void; stock: Record<string, number> }) {
   return (
     <section id="products" className="py-20 px-6">
       <div className="max-w-5xl mx-auto">
@@ -276,7 +294,7 @@ function Products({ onAddToCart }: { onAddToCart: (product: Product) => void }) 
 
         <div className="grid md:grid-cols-3 gap-6">
           {PRODUCTS.map(product => (
-            <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+            <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} stock={stock[product.id] || 0} />
           ))}
         </div>
 
@@ -714,6 +732,27 @@ export default function ShopPage() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [stock, setStock] = useState<Record<string, number>>({})
+
+  // Fetch stock on mount and periodically
+  useEffect(() => {
+    const fetchStock = async () => {
+      try {
+        const res = await fetch('/api/stock')
+        const data = await res.json()
+        if (data.stock) {
+          setStock(data.stock)
+        }
+      } catch (error) {
+        console.error('Error fetching stock:', error)
+      }
+    }
+    
+    fetchStock()
+    // Refresh stock every 30 seconds
+    const interval = setInterval(fetchStock, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -752,7 +791,7 @@ export default function ShopPage() {
         <main>
           <Hero />
           <Stats />
-          <Products onAddToCart={addToCart} />
+          <Products onAddToCart={addToCart} stock={stock} />
           <ScriptFeatures />
           <SupportedGames />
           <FAQ />
