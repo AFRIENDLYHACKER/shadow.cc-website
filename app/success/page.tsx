@@ -99,7 +99,7 @@ export default function SuccessPage() {
               Return to Shop
             </Link>
             <a
-              href="https://discord.gg/Kezxm2TyGY"
+              href="https://discord.gg/aEnqgtK8sU"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 bg-foreground text-background py-3 px-6 transition-colors text-center text-sm uppercase tracking-wider hover:bg-accent"
@@ -192,7 +192,7 @@ export default function SuccessPage() {
             Back to Shop
           </Link>
           <a
-            href="https://discord.gg/Kezxm2TyGY"
+            href="https://discord.gg/aEnqgtK8sU"
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 bg-foreground text-background py-3 px-6 transition-colors text-center text-sm uppercase tracking-wider hover:bg-accent"
