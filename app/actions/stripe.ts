@@ -1,6 +1,6 @@
 'use server'
 
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 import { PRODUCTS } from '@/lib/products'
 import { headers } from 'next/headers'
 
@@ -35,7 +35,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
     }
   })
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     ui_mode: 'embedded',
     line_items: lineItems,
     mode: 'payment',
@@ -46,7 +46,7 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
 }
 
 export async function getCheckoutSession(sessionId: string) {
-  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+  const session = await getStripe().checkout.sessions.retrieve(sessionId, {
     expand: ['line_items', 'line_items.data.price.product'],
   })
   

@@ -1,26 +1,18 @@
-# ShadowCC shop website
+# Vlasic.CC Shop Website
 
 *Automatically synced with your [v0.app](https://v0.app) deployments*
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/darkphoenixv3-7993s-projects/v0-shadow-cc-shop-website-4j)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/cnoti7unMUe)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
+[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app)
 
 ## Overview
 
+Vlasic.CC is a premium digital services shop offering:
+- **Script Keys** for Tha Bronx 3 & Philly Streets 2 (Weekly, Monthly, Lifetime)
+- **Discord Alt Gen** tool for generating Discord accounts
+
 This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
 Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/darkphoenixv3-7993s-projects/v0-shadow-cc-shop-website-4j](https://vercel.com/darkphoenixv3-7993s-projects/v0-shadow-cc-shop-website-4j)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/cnoti7unMUe](https://v0.app/chat/cnoti7unMUe)**
 
 ## How It Works
 
