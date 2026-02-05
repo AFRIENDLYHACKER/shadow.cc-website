@@ -20,41 +20,58 @@ export async function POST(request: Request) {
     }
     
     // Check if key was already claimed for this session (stored in metadata)
-    if (session.metadata?.key_claimed) {
-      return NextResponse.json({ 
-        error: 'Key already claimed for this session',
-        key: session.metadata.claimed_key 
-      }, { status: 200 })
+    if (session.metadata?.keys_claimed) {
+      // Return previously claimed keys
+      try {
+        const previousKeys = JSON.parse(session.metadata.keys_claimed)
+        return NextResponse.json({ 
+          success: true,
+          keys: previousKeys,
+          email: session.customer_details?.email,
+          alreadyClaimed: true
+        })
+      } catch {
+        return NextResponse.json({ 
+          error: 'Key already claimed for this session'
+        }, { status: 200 })
+      }
     }
     
-    // Get the product ID from the session
-    const lineItems = session.line_items?.data || []
+    // Get cart items from session metadata
+    const cartMetadata = session.metadata?.cart_items
+    if (!cartMetadata) {
+      return NextResponse.json({ error: 'No cart items found in session' }, { status: 400 })
+    }
+    
+    // Parse cart items (format: "productId:quantity,productId:quantity")
+    const cartItems = cartMetadata.split(',').map(item => {
+      const [productId, quantity] = item.split(':')
+      return { productId, quantity: parseInt(quantity, 10) || 1 }
+    })
+    
     const claimedKeys: { productId: string; key: string }[] = []
     
-    for (const item of lineItems) {
-      const productId = (item.price?.product as { metadata?: { product_id?: string } })?.metadata?.product_id
-      const quantity = item.quantity || 1
+    for (const item of cartItems) {
+      const { productId, quantity } = item
       
-      if (productId) {
-        for (let i = 0; i < quantity; i++) {
-          // Check stock before claiming
-          const stock = getStock(productId)
-          if (stock === 0) {
-            return NextResponse.json({ 
-              error: `Out of stock for ${productId}`,
-              claimedKeys 
-            }, { status: 400 })
-          }
-          
-          const key = claimKey(productId)
-          if (key) {
-            claimedKeys.push({ productId, key })
-          } else {
-            return NextResponse.json({ 
-              error: `Failed to claim key for ${productId}`,
-              claimedKeys 
-            }, { status: 500 })
-          }
+      for (let i = 0; i < quantity; i++) {
+        // Check stock before claiming
+        const stock = getStock(productId)
+        if (stock === 0) {
+          return NextResponse.json({ 
+            error: `Out of stock for ${productId}`,
+            claimedKeys 
+          }, { status: 400 })
+        }
+        
+        const key = claimKey(productId)
+        if (key) {
+          claimedKeys.push({ productId, key })
+        } else {
+          return NextResponse.json({ 
+            error: `Failed to claim key for ${productId}`,
+            claimedKeys 
+          }, { status: 500 })
         }
       }
     }
