@@ -35,11 +35,17 @@ export async function startCheckoutSession(cartItems: CartItem[]) {
     }
   })
 
+  // Store cart items in session metadata for reliable retrieval
+  const cartMetadata = cartItems.map(item => `${item.productId}:${item.quantity}`).join(',')
+
   const session = await getStripe().checkout.sessions.create({
     ui_mode: 'embedded',
     line_items: lineItems,
     mode: 'payment',
     return_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+    metadata: {
+      cart_items: cartMetadata,
+    },
   })
 
   return { clientSecret: session.client_secret }
