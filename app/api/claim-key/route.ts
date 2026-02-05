@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { claimKey, getStock } from '@/lib/keys'
-import { stripe } from '@/lib/stripe'
+import { getStripe } from '@/lib/stripe'
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     }
     
     // Verify the Stripe session is paid
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    const session = await getStripe().checkout.sessions.retrieve(sessionId, {
       expand: ['line_items', 'line_items.data.price.product'],
     })
     

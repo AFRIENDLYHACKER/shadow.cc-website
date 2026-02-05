@@ -2,12 +2,17 @@ import 'server-only'
 
 import Stripe from 'stripe'
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+let stripeInstance: Stripe | null = null
 
-if (!stripeSecretKey && process.env.NODE_ENV === 'production') {
-  throw new Error('STRIPE_SECRET_KEY is not set')
+export function getStripe(): Stripe {
+  if (!stripeInstance) {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+    if (!stripeSecretKey) {
+      throw new Error('STRIPE_SECRET_KEY is not configured')
+    }
+    stripeInstance = new Stripe(stripeSecretKey, {
+      typescript: true,
+    })
+  }
+  return stripeInstance
 }
-
-export const stripe = new Stripe(stripeSecretKey || 'sk_test_placeholder', {
-  typescript: true,
-})
